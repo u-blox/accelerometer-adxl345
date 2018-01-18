@@ -80,7 +80,7 @@ bool AccelerometerAdxl345::getRegisters(char address, char *pValues, int numValu
                 if (gpI2c->read(gAddress, pValues, numValues) == 0) {
                     success = true;
 #ifdef DEBUG_ADXL345
-                    printf("AccelerometerAdxl345 (I2C 0x%02x): read %d bytes(s) from register 0x%02x.\n", gAddress >> 1, numValues, address);
+                    printf("AccelerometerAdxl345 (I2C 0x%02x): read %d byte(s) from register 0x%02x.\n", gAddress >> 1, numValues, address);
 #endif
                 }
             } else {
@@ -250,7 +250,7 @@ bool AccelerometerAdxl345::read(int16_t *pX, int16_t *pY, int16_t *pZ)
         data[1] = 0x08; // Measurement mode
         if (gpI2c->write(gAddress, data, 2) == 0) {
             wait_ms(10);
-            if (getRegisters(0x32, &(data[0]), sizeof (data)) == 0) {
+            if (getRegisters(0x32, &(data[0]), sizeof (data))) {
                 success = true;
                 x = data[0] + ((int16_t) data[1] << 8);
                 y = data[2] + ((int16_t) data[3] << 8);
@@ -341,9 +341,6 @@ bool AccelerometerAdxl345::enableInterrupts(void)
     char data[2];
 
     if (gReady) {
-#ifdef DEBUG_ADXL345
-        printf("AccelerometerAdxl345 is connected at I2C address 0x%02x.\n", gAddress >> 1);
-#endif
         // Set up the interrupts: activity only
         data[0] = 0x2e;
         data[1] = 0x00;  // Disable all interrupts for the moment
